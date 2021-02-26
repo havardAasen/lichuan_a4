@@ -106,14 +106,20 @@ static void quit(int sig)
 
 int match_string(char *string, char **matches)
 {
-    int len, which, match;
+    unsigned int len;
+    int which, match;
     which = 0;
     match = -1;
-    if ((matches == NULL) || (string == NULL)) return -1;
+    if ((matches == NULL) || (string == NULL)) {
+        return -1;
+    }
     len = strlen(string);
     while (matches[which] != NULL) {
         if ((!strncmp(string, matches[which], len)) && (len <= strlen(matches[which]))) {
-            if (match >= 0) return -1;  /* Multiple matches */
+            /* Multiple matches */
+            if (match >= 0) {
+                return -1;
+            }
             match = which;
         }
         ++which;
