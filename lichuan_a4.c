@@ -39,7 +39,6 @@ struct haldata {
     /* Parameter */
     hal_float_t     period;
     hal_s32_t       modbus_errors;
-    hal_s32_t       retval;
 };
 
 int hal_comp_id;
@@ -69,14 +68,12 @@ static int read_data(modbus_t *mb_ctx, struct targetdata *targetdata,
 
     if (retval == targetdata->read_reg_count) {
         retval = 0;
-        hal_data_block->retval = retval;
         if (retval == 0) {
             *(hal_data_block->commanded_speed) = receive_data[0];
             *(hal_data_block->feedback_speed) = receive_data[1];
             *(hal_data_block->deviation_speed) = receive_data[2];
         }
     } else {
-        hal_data_block->retval = retval;
         hal_data_block->modbus_errors++;
         retval = -1;
     }
@@ -318,10 +315,6 @@ int main(int argc, char **argv)
 
     retval = hal_param_s32_newf(HAL_RO, &(haldata->modbus_errors),
                                 hal_comp_id, "%s.modbus-errors", modname);
-    if (retval != 0) goto out_closeHAL;
-
-    retval = hal_param_s32_newf(HAL_RO, &(haldata->retval),
-                                hal_comp_id, "%s.retval", modname);
     if (retval != 0) goto out_closeHAL;
 
     *haldata->commanded_speed = 0;
