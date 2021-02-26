@@ -137,7 +137,7 @@ void usage(char **argv)
     printf("   -n, --name <string> (default: lichuan_a4)\n");
     printf("       Set the name of the HAL module. The HAL comp name will be set to <string>, and all pin\n");
     printf("       and parameter names will begin with <string>.\n");
-    printf("   -p, --parity {even,odd,none} (default: none)\n");
+    printf("   -p, --parity {even,odd,none} (default: even)\n");
     printf("       Set serial parity to 'even', 'odd', or 'none'.\n");
     printf("   -r, --rate <n> (default: 19200)\n");
     printf("       Set baud rate to <n>. It is an error if the rate is not one of the following:\n");
@@ -177,7 +177,7 @@ int main(int argc, char **argv)
     device = "/dev/ttyUSB0";
     baud = 19200;
     bits = 8;
-    parity = 'N';
+    parity = 'E';
     stopbits = 1;
 
     verbose = 0;
@@ -266,7 +266,7 @@ int main(int argc, char **argv)
     signal(SIGINT, quit);
     signal(SIGTERM, quit);
 
-    /* Assume 19200 bps 8-N-1 serial setting, device 1 */
+    /* Assume 19200 bps 8-E-1 serial setting, device 1 */
     mb_ctx = modbus_new_rtu(device, baud, parity, bits, stopbits);
     if (mb_ctx == NULL) {
         fprintf(stderr, "%s: ERROR: Couldn't open modbus serial device: %s\n",
