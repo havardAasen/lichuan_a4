@@ -174,6 +174,22 @@ static int hal_setup(int id, struct haldata *h, const char *name)
 }
 #undef PIN
 
+static int set_haldata_defaults(struct haldata *haldata)
+{
+    *haldata->commanded_speed = 0;
+    *haldata->feedback_speed = 0;
+    *haldata->deviation_speed = 0;
+    *haldata->dc_bus_volt = 0;
+    *haldata->torque_load = 0;
+    *haldata->res_braking = 0;
+    *haldata->torque_overload = 0;
+
+    haldata->period = 2.0;
+    haldata->modbus_errors = 0;
+
+    return 0;
+}
+
 int main(int argc, char **argv)
 {
     struct haldata *haldata;
@@ -337,12 +353,8 @@ int main(int argc, char **argv)
     if (hal_setup(hal_comp_id, haldata, modname)) {
         goto out_closeHAL;
     }
-    *haldata->commanded_speed = 0;
-    *haldata->feedback_speed = 0;
-    *haldata->deviation_speed = 0;
 
-    haldata->period = 2.0;
-    haldata->modbus_errors = 0;
+    set_haldata_defaults(haldata);
 
     /* Activate HAL component */
     hal_ready(hal_comp_id);
