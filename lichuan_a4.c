@@ -64,7 +64,7 @@ static int read_data(modbus_t *mb_ctx, struct targetdata *targetdata,
     }
 
     retval = modbus_read_registers(mb_ctx, targetdata->read_reg_start,
-                                targetdata->read_reg_count, receive_data);
+                                   targetdata->read_reg_count, receive_data);
 
     if (retval == targetdata->read_reg_count) {
         retval = 0;
@@ -95,7 +95,8 @@ static char *option_string = "d:n:p:r:vt:h";
 static char *paritystrings[] = {"even", "odd", "none", NULL};
 static char paritychars[] = {'E', 'O', 'N'};
 
-static char *ratestrings[] = {"2400", "4800", "9600", "19200", "38400", "57600", "115200", NULL};
+static char *ratestrings[] = {"2400", "4800", "9600", "19200", "38400",
+                              "57600", "115200", NULL};
 
 static void quit(int sig)
 {
@@ -190,10 +191,15 @@ int main(int argc, char **argv)
     /* Process command line options */
     while ((opt = getopt_long(argc, argv, option_string, long_options, NULL)) != -1) {
         switch (opt) {
-            case 'd':  /* Device name, default /dev/ttyUSB0 */
-                /* Could check the device name here, but we'll leave it to the library open */
+            /* Device name, default /dev/ttyUSB0 */
+            case 'd':
+                /*
+                 * Could check the device name here, but we'll leave it
+                 * to the library open
+                 */
                 if (strlen(optarg) > FILENAME_MAX) {
-                    fprintf(stderr, "ERROR: device node name is to long: %s\n", optarg);
+                    fprintf(stderr, "ERROR: device node name is to long: %s\n",
+                            optarg);
                     retval = -1;
                     goto out_noclose;
                 }
@@ -203,14 +209,16 @@ int main(int argc, char **argv)
             /* Module base name */
             case 'n':
                 if (strlen(optarg) > HAL_NAME_LEN - 20) {
-                    fprintf(stderr, "ERROR: HAL module name to long: %s\n", optarg);
+                    fprintf(stderr, "ERROR: HAL module name to long: %s\n",
+                            optarg);
                     retval = -1;
                     goto out_noclose;
                 }
                 modname = strdup(optarg);
                 break;
 
-            case 'p':  /* Parity, should be a string like "even", "odd" or "none" */
+            /* Parity, should be a string like "even", "odd" or "none" */
+            case 'p':
                 argindex = match_string(optarg, paritystrings);
                 if (argindex < 0) {
                     fprintf(stderr, "ERROR: invalid parity: %s\n", optarg);
@@ -220,7 +228,8 @@ int main(int argc, char **argv)
                 parity = paritychars[argindex];
                 break;
 
-            case 'r':  /* Baud rate, defaults to 19200 */
+            /* Baud rate, defaults to 19200 */
+            case 'r':
                 argindex = match_string(optarg, ratestrings);
                 if (argindex < 0) {
                     fprintf(stderr, "ERROR: invalid baud rate: %s\n", optarg);
@@ -230,10 +239,12 @@ int main(int argc, char **argv)
                 baud = atoi(ratestrings[argindex]);
                 break;
 
-            case 't':  /* Target number (MODBUS ID), default 1 */
+            /* Target number (MODBUS ID), default 1 */
+            case 't':
                 argvalue = strtol(optarg, &endarg, 10);
                 if ((*endarg != '\0') || (argvalue < 1) || (argvalue > 31)) {
-                    fprintf(stderr, "ERROR: invalid target number: %s\n", optarg);
+                    fprintf(stderr, "ERROR: invalid target number: %s\n",
+                            optarg);
                     retval = -1;
                     goto out_noclose;
                 }
@@ -257,7 +268,7 @@ int main(int argc, char **argv)
     }
 
     printf("%s: device='%s', baud=%d, bits=%d, parity='%c', stopbits=%d, address=%d\n",
-            modname, device, baud, bits, parity, stopbits, target);
+           modname, device, baud, bits, parity, stopbits, target);
 
     /*
      * Point TERM and INT signals at our quit function.
@@ -296,7 +307,8 @@ int main(int argc, char **argv)
 
     haldata = (struct haldata *)hal_malloc(sizeof(struct haldata));
     if (haldata == NULL) {
-        fprintf(stderr, "%s: ERROR: unable to allocate shared memory\n", modname);
+        fprintf(stderr, "%s: ERROR: unable to allocate shared memory\n",
+                modname);
         retval = -1;
         goto out_closeHAL;
     }
