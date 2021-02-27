@@ -153,6 +153,27 @@ void usage(char **argv)
     printf("       Show this help.\n");
 }
 
+#define PIN(x)\
+        do {\
+            status = (x);\
+            if (status != 0) return status;\
+        } while (0)
+
+static int hal_setup(int id, struct haldata *h, const char *name)
+{
+    int status;
+
+    PIN(hal_pin_float_newf(HAL_OUT, &(h->commanded_speed), id, "%s.commanded-speed", name));
+    PIN(hal_pin_float_newf(HAL_OUT, &(h->feedback_speed), id, "%s.feedback-speed", name));
+    PIN(hal_pin_float_newf(HAL_OUT, &(h->deviation_speed), id, "%s.deviation-speed", name));
+
+    PIN(hal_param_float_newf(HAL_RW, &(h->period), id, "%s.period-seconds", name));
+    PIN(hal_param_s32_newf(HAL_RO, &(h->modbus_errors), id, "%s.modbus-errors", name));
+
+    return 0;
+}
+#undef PIN
+
 int main(int argc, char **argv)
 {
     struct haldata *haldata;
@@ -313,26 +334,9 @@ int main(int argc, char **argv)
         goto out_closeHAL;
     }
 
-    retval = hal_pin_float_newf(HAL_OUT, &(haldata->commanded_speed),
-                                hal_comp_id, "%s.frequency-command", modname);
-    if (retval != 0) goto out_closeHAL;
-
-    retval = hal_pin_float_newf(HAL_OUT, &(haldata->feedback_speed),
-                                hal_comp_id, "%s.frequency-out", modname);
-    if (retval != 0) goto out_closeHAL;
-
-    retval = hal_pin_float_newf(HAL_OUT, &(haldata->deviation_speed),
-                                hal_comp_id, "%s.output-current", modname);
-    if (retval != 0) goto out_closeHAL;
-
-    retval = hal_param_float_newf(HAL_RW, &(haldata->period),
-                                  hal_comp_id, "%s.period-seconds", modname);
-    if (retval != 0) goto out_closeHAL;
-
-    retval = hal_param_s32_newf(HAL_RO, &(haldata->modbus_errors),
-                                hal_comp_id, "%s.modbus-errors", modname);
-    if (retval != 0) goto out_closeHAL;
-
+    if (hal_setup(hal_comp_id, haldata, modname)) {
+        goto out_closeHAL;
+    }
     *haldata->commanded_speed = 0;
     *haldata->feedback_speed = 0;
     *haldata->deviation_speed = 0;
