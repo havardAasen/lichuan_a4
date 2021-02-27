@@ -30,8 +30,20 @@ struct targetdata {
     int read_reg_count;
 };
 
+/**
+ * struct haldata - Signals, pins and parameters, to and from HAL.
+ * @commanded_speed: Current commanded speed (RPM)
+ * @feedback_speed:  Current feedback speed (RPM)
+ * @deviation_speed: Current speed deviation (RPM)
+ * @dc_bus_volt:     DC bus voltage (V)
+ * @torque_load:     Torque load ratio (%)
+ * @res_braking:     Resistance braking rate (%)
+ * @torque_overload: Torque overload ratio (%)
+ * @period:          How often Modbus is polled
+ * @modbus_errors:   Amount of Modbus errors
+ */
 struct haldata {
-    /* Read pin from servo driver */
+    /* Info from driver */
     hal_float_t     *commanded_speed;
     hal_float_t     *feedback_speed;
     hal_float_t     *deviation_speed;
@@ -167,6 +179,17 @@ void usage(char **argv)
             if (status != 0) return status;\
         } while (0)
 
+/**
+ * hal_setup - Declare haldata pins.
+ * @id:     HAL component id.
+ * @h:      haldata that contain all the pins.
+ * @name:   Name of the HAL module.
+ *
+ * Declare haldata variables, and link them to LinuxCNC. Use the macro 'PIN'
+ * to shorten the typing.
+ *
+ * Return: 0 on success, non-zero otherwise.
+ */
 static int hal_setup(int id, struct haldata *h, const char *name)
 {
     int status;
@@ -186,6 +209,14 @@ static int hal_setup(int id, struct haldata *h, const char *name)
 }
 #undef PIN
 
+/**
+ * set_haldata_defaults - Initialize HAL data variables.
+ * @haldata: Contains all the pins.
+ *
+ * Initialize all variables to the correct value.
+ *
+ * Return: 0 on success
+ */
 static int set_haldata_defaults(struct haldata *haldata)
 {
     *haldata->commanded_speed = 0;
