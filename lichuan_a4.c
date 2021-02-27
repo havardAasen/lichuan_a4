@@ -22,7 +22,7 @@
 #define NUM_MODBUS_RETRIES 5
 
 #define START_REGISTER_R        0x01C0
-#define NUM_REGISTER_R          3
+#define NUM_REGISTER_R          13
 
 struct targetdata {
     int target;
@@ -35,6 +35,10 @@ struct haldata {
     hal_float_t     *commanded_speed;
     hal_float_t     *feedback_speed;
     hal_float_t     *deviation_speed;
+    hal_float_t     *dc_bus_volt;
+    hal_float_t     *torque_load;
+    hal_float_t     *res_braking;
+    hal_float_t     *torque_overload;
 
     /* Parameter */
     hal_float_t     period;
@@ -71,6 +75,10 @@ static int read_data(modbus_t *mb_ctx, struct targetdata *targetdata,
         *(hal_data_block->commanded_speed) = receive_data[0];
         *(hal_data_block->feedback_speed) = receive_data[1];
         *(hal_data_block->deviation_speed) = receive_data[2];
+        *(hal_data_block->dc_bus_volt) = receive_data[9];
+        *(hal_data_block->torque_load) = receive_data[10];
+        *(hal_data_block->res_braking) = receive_data[11];
+        *(hal_data_block->torque_overload) = receive_data[12];
     } else {
         hal_data_block->modbus_errors++;
         retval = -1;
@@ -166,6 +174,10 @@ static int hal_setup(int id, struct haldata *h, const char *name)
     PIN(hal_pin_float_newf(HAL_OUT, &(h->commanded_speed), id, "%s.commanded-speed", name));
     PIN(hal_pin_float_newf(HAL_OUT, &(h->feedback_speed), id, "%s.feedback-speed", name));
     PIN(hal_pin_float_newf(HAL_OUT, &(h->deviation_speed), id, "%s.deviation-speed", name));
+    PIN(hal_pin_float_newf(HAL_OUT, &(h->dc_bus_volt), id, "%s.dc-bus-volt", name));
+    PIN(hal_pin_float_newf(HAL_OUT, &(h->torque_load), id, "%s.torque-load", name));
+    PIN(hal_pin_float_newf(HAL_OUT, &(h->res_braking), id, "%s.res-braking", name));
+    PIN(hal_pin_float_newf(HAL_OUT, &(h->torque_overload), id, "%s.torque-overload", name));
 
     PIN(hal_param_float_newf(HAL_RW, &(h->period), id, "%s.period-seconds", name));
     PIN(hal_param_s32_newf(HAL_RO, &(h->modbus_errors), id, "%s.modbus-errors", name));
