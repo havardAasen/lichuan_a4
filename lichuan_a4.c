@@ -68,11 +68,9 @@ static int read_data(modbus_t *mb_ctx, struct targetdata *targetdata,
 
     if (retval == targetdata->read_reg_count) {
         retval = 0;
-        if (retval == 0) {
-            *(hal_data_block->commanded_speed) = receive_data[0];
-            *(hal_data_block->feedback_speed) = receive_data[1];
-            *(hal_data_block->deviation_speed) = receive_data[2];
-        }
+        *(hal_data_block->commanded_speed) = receive_data[0];
+        *(hal_data_block->feedback_speed) = receive_data[1];
+        *(hal_data_block->deviation_speed) = receive_data[2];
     } else {
         hal_data_block->modbus_errors++;
         retval = -1;
