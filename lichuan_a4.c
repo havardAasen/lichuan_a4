@@ -102,7 +102,6 @@ static int read_data(modbus_t *mb_ctx, struct targetdata *targetdata,
 static struct option long_options[] = {
     {"device", 1, 0, 'd'},
     {"name", 1, 0 , 'n'},
-    {"parity", 1, 0, 'p'},
     {"rate", 1, 0, 'r'},
     {"verbose", 0, 0, 'v'},
     {"target", 1, 0, 't'},
@@ -110,10 +109,7 @@ static struct option long_options[] = {
     {0,0,0,0}
 };
 
-static char *option_string = "d:n:p:r:vt:h";
-
-static char *paritystrings[] = {"even", "odd", "none", NULL};
-static char paritychars[] = {'E', 'O', 'N'};
+static char *option_string = "d:n:r:vt:h";
 
 static char *ratestrings[] = {"2400", "4800", "9600", "19200", "38400",
                               "57600", "115200", NULL};
@@ -159,8 +155,6 @@ void usage(char **argv)
     printf("   -n, --name <string> (default: lichuan_a4)\n");
     printf("       Set the name of the HAL module. The HAL comp name will be set to <string>, and all pin\n");
     printf("       and parameter names will begin with <string>.\n");
-    printf("   -p, --parity {even,odd,none} (default: even)\n");
-    printf("       Set serial parity to 'even', 'odd', or 'none'.\n");
     printf("   -r, --rate <n> (default: 19200)\n");
     printf("       Set baud rate to <n>. It is an error if the rate is not one of the following:\n");
     printf("       2400, 4800, 9600, 19200, 38400, 57600, 115200\n");
@@ -297,17 +291,6 @@ int main(int argc, char **argv)
                 modname = strdup(optarg);
                 break;
 
-            /* Parity, should be a string like "even", "odd" or "none" */
-            case 'p':
-                argindex = match_string(optarg, paritystrings);
-                if (argindex < 0) {
-                    fprintf(stderr, "ERROR: invalid parity: %s\n", optarg);
-                    retval = -1;
-                    goto out_noclose;
-                }
-                parity = paritychars[argindex];
-                break;
-
             /* Baud rate, defaults to 19200 */
             case 'r':
                 argindex = match_string(optarg, ratestrings);
@@ -428,4 +411,3 @@ out_close:
 out_noclose:
     return retval;
 }
-
