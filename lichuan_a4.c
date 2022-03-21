@@ -47,8 +47,6 @@ struct haldata {
     hal_s32_t       modbus_errors;      /**< Amount of Modbus errors */
 };
 
-int hal_comp_id;
-
 static int done;
 char *modname = "lichuan_a4";
 
@@ -223,6 +221,7 @@ int main(int argc, char **argv)
     int verbose;
 
     int retval = 0;
+    int hal_comp_id;
     modbus_t *mb_ctx;
     int target;
     char *endarg;
