@@ -167,23 +167,22 @@ void usage(char **argv)
  * @brief Create HAL pins.
  * @param id Component ID created by HAL.
  * @param h Information to and from, LinuxCNC.
- * @param name Name of the HAL module.
  * @return 0 on success, non-zero otherwise.
  */
-static int hal_setup(int id, struct haldata *h, const char *name)
+static int hal_setup(int id, struct haldata *h)
 {
     int status;
 
-    PIN(hal_pin_float_newf(HAL_OUT, &h->commanded_speed, id, "%s.commanded-speed", name));
-    PIN(hal_pin_float_newf(HAL_OUT, &h->feedback_speed, id, "%s.feedback-speed", name));
-    PIN(hal_pin_float_newf(HAL_OUT, &h->deviation_speed, id, "%s.deviation-speed", name));
-    PIN(hal_pin_float_newf(HAL_OUT, &h->dc_bus_volt, id, "%s.dc-bus-volt", name));
-    PIN(hal_pin_float_newf(HAL_OUT, &h->torque_load, id, "%s.torque-load", name));
-    PIN(hal_pin_float_newf(HAL_OUT, &h->res_braking, id, "%s.res-braking", name));
-    PIN(hal_pin_float_newf(HAL_OUT, &h->torque_overload, id, "%s.torque-overload", name));
+    PIN(hal_pin_float_newf(HAL_OUT, &h->commanded_speed, id, "%s.commanded-speed", modname));
+    PIN(hal_pin_float_newf(HAL_OUT, &h->feedback_speed, id, "%s.feedback-speed", modname));
+    PIN(hal_pin_float_newf(HAL_OUT, &h->deviation_speed, id, "%s.deviation-speed", modname));
+    PIN(hal_pin_float_newf(HAL_OUT, &h->dc_bus_volt, id, "%s.dc-bus-volt", modname));
+    PIN(hal_pin_float_newf(HAL_OUT, &h->torque_load, id, "%s.torque-load", modname));
+    PIN(hal_pin_float_newf(HAL_OUT, &h->res_braking, id, "%s.res-braking", modname));
+    PIN(hal_pin_float_newf(HAL_OUT, &h->torque_overload, id, "%s.torque-overload", modname));
 
-    PIN(hal_param_float_newf(HAL_RW, &h->period, id, "%s.period-seconds", name));
-    PIN(hal_param_s32_newf(HAL_RO, &h->modbus_errors, id, "%s.modbus-errors", name));
+    PIN(hal_param_float_newf(HAL_RW, &h->period, id, "%s.period-seconds", modname));
+    PIN(hal_param_s32_newf(HAL_RO, &h->modbus_errors, id, "%s.modbus-errors", modname));
 
     return 0;
 }
@@ -352,7 +351,7 @@ int main(int argc, char **argv)
         goto out_closeHAL;
     }
 
-    if (hal_setup(hal_comp_id, haldata, modname)) {
+    if (hal_setup(hal_comp_id, haldata)) {
         goto out_closeHAL;
     }
 
