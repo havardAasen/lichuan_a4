@@ -53,18 +53,18 @@ static int done;
 char *modname = "lichuan_a4";
 
 static int read_data(modbus_t *mb_ctx, struct targetdata *targetdata,
-              struct haldata *hal_data_block)
+                     struct haldata *hal_data_block)
 {
     uint16_t receive_data[MODBUS_MAX_READ_REGISTERS];
     int retval;
 
     /* Can't do anything with an empty datablock */
-    if (hal_data_block == NULL)
+    if (hal_data_block == NULL) {
         return -1;
+    }
 
     /* Signal error if parameter is null */
-    if ((mb_ctx == NULL) || (targetdata == NULL))
-    {
+    if ((mb_ctx == NULL) || (targetdata == NULL)) {
         hal_data_block->modbus_errors++;
         return -1;
     }
@@ -74,13 +74,13 @@ static int read_data(modbus_t *mb_ctx, struct targetdata *targetdata,
 
     if (retval == targetdata->read_reg_count) {
         retval = 0;
-        *(hal_data_block->commanded_speed) = receive_data[0];
-        *(hal_data_block->feedback_speed) = receive_data[1];
-        *(hal_data_block->deviation_speed) = receive_data[2];
-        *(hal_data_block->dc_bus_volt) = receive_data[9];
-        *(hal_data_block->torque_load) = receive_data[10];
-        *(hal_data_block->res_braking) = receive_data[11];
-        *(hal_data_block->torque_overload) = receive_data[12];
+        *hal_data_block->commanded_speed = receive_data[0];
+        *hal_data_block->feedback_speed = receive_data[1];
+        *hal_data_block->deviation_speed = receive_data[2];
+        *hal_data_block->dc_bus_volt = receive_data[9];
+        *hal_data_block->torque_load = receive_data[10];
+        *hal_data_block->res_braking = receive_data[11];
+        *hal_data_block->torque_overload = receive_data[12];
     } else {
         hal_data_block->modbus_errors++;
         retval = -1;
@@ -174,16 +174,16 @@ static int hal_setup(int id, struct haldata *h, const char *name)
 {
     int status;
 
-    PIN(hal_pin_float_newf(HAL_OUT, &(h->commanded_speed), id, "%s.commanded-speed", name));
-    PIN(hal_pin_float_newf(HAL_OUT, &(h->feedback_speed), id, "%s.feedback-speed", name));
-    PIN(hal_pin_float_newf(HAL_OUT, &(h->deviation_speed), id, "%s.deviation-speed", name));
-    PIN(hal_pin_float_newf(HAL_OUT, &(h->dc_bus_volt), id, "%s.dc-bus-volt", name));
-    PIN(hal_pin_float_newf(HAL_OUT, &(h->torque_load), id, "%s.torque-load", name));
-    PIN(hal_pin_float_newf(HAL_OUT, &(h->res_braking), id, "%s.res-braking", name));
-    PIN(hal_pin_float_newf(HAL_OUT, &(h->torque_overload), id, "%s.torque-overload", name));
+    PIN(hal_pin_float_newf(HAL_OUT, &h->commanded_speed, id, "%s.commanded-speed", name));
+    PIN(hal_pin_float_newf(HAL_OUT, &h->feedback_speed, id, "%s.feedback-speed", name));
+    PIN(hal_pin_float_newf(HAL_OUT, &h->deviation_speed, id, "%s.deviation-speed", name));
+    PIN(hal_pin_float_newf(HAL_OUT, &h->dc_bus_volt, id, "%s.dc-bus-volt", name));
+    PIN(hal_pin_float_newf(HAL_OUT, &h->torque_load, id, "%s.torque-load", name));
+    PIN(hal_pin_float_newf(HAL_OUT, &h->res_braking, id, "%s.res-braking", name));
+    PIN(hal_pin_float_newf(HAL_OUT, &h->torque_overload, id, "%s.torque-overload", name));
 
-    PIN(hal_param_float_newf(HAL_RW, &(h->period), id, "%s.period-seconds", name));
-    PIN(hal_param_s32_newf(HAL_RO, &(h->modbus_errors), id, "%s.modbus-errors", name));
+    PIN(hal_param_float_newf(HAL_RW, &h->period, id, "%s.period-seconds", name));
+    PIN(hal_param_s32_newf(HAL_RO, &h->modbus_errors, id, "%s.modbus-errors", name));
 
     return 0;
 }
@@ -262,7 +262,6 @@ int main(int argc, char **argv)
                 }
                 device = strdup(optarg);
                 break;
-
             /* Module base name */
             case 'n':
                 if (strlen(optarg) > HAL_NAME_LEN - 20) {
@@ -273,7 +272,6 @@ int main(int argc, char **argv)
                 }
                 modname = strdup(optarg);
                 break;
-
             /* Baud rate, defaults to 19200 */
             case 'r':
                 argindex = match_string(optarg, ratestrings);
@@ -284,7 +282,6 @@ int main(int argc, char **argv)
                 }
                 baud = atoi(ratestrings[argindex]);
                 break;
-
             /* Target number (MODBUS ID), default 1 */
             case 't':
                 argvalue = strtol(optarg, &endarg, 10);
@@ -296,16 +293,13 @@ int main(int argc, char **argv)
                 }
                 target = argvalue;
                 break;
-
             case 'v':
                 verbose = 1;
                 break;
-
             case 'h':
                 usage(argv);
                 exit(0);
                 break;
-
             default:
                 usage(argv);
                 exit(1);
@@ -340,18 +334,17 @@ int main(int argc, char **argv)
     }
 
     modbus_set_debug(mb_ctx, verbose);
-
     modbus_set_slave(mb_ctx, target);
 
     /* Create HAL component */
     hal_comp_id = hal_init(modname);
-    if (hal_comp_id <0) {
+    if (hal_comp_id < 0) {
         fprintf(stderr, "%s: ERROR: hal_init failed\n", modname);
         retval = hal_comp_id;
         goto out_close;
     }
 
-    haldata = (struct haldata *)hal_malloc(sizeof(struct haldata));
+    haldata = hal_malloc(sizeof(struct haldata));
     if (haldata == NULL) {
         fprintf(stderr, "%s: ERROR: unable to allocate shared memory\n",
                 modname);
