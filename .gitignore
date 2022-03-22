@@ -1,2 +1,4 @@
-lichuan_a4.o
+*.swp
+*.o
 lichuan_a4
+.idea/
