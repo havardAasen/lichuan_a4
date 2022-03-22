@@ -1,9 +1,8 @@
-/*
-    lichuan_a4.c
-
-    This is a userspace program that interfaces the Lichuan A4 servo drives
-    to the LinuxCNC HAL, using RS485 ModBus RTU.
-*/
+/**
+ *  @file lichuan_a4.c
+ *  @brief A userspace program that interfaces the Lichuan A4 servo drive
+ *         to the LinuxCNC HAL, using RS485 ModBus RTU.
+ */
 
 
 #include <errno.h>
@@ -18,43 +17,33 @@
 #include "hal.h"
 
 
-/* If a modbus transaction fails, retry this many times before giving up. */
+/** If a modbus transaction fails, retry this many times before giving up. */
 #define NUM_MODBUS_RETRIES 5
 
 #define START_REGISTER_R        0x01C0
 #define NUM_REGISTER_R          13
 
+/** Target and registers to read from. */
 struct targetdata {
-    int target;
-    int read_reg_start;
-    int read_reg_count;
+    int target;             /*!< address of device to read from */
+    int read_reg_start;     /*!< register to start reading from */
+    int read_reg_count;     /*!< how many registers to read */
 };
 
-/**
- * struct haldata - Signals, pins and parameters, to and from HAL.
- * @commanded_speed: Current commanded speed (RPM)
- * @feedback_speed:  Current feedback speed (RPM)
- * @deviation_speed: Current speed deviation (RPM)
- * @dc_bus_volt:     DC bus voltage (V)
- * @torque_load:     Torque load ratio (%)
- * @res_braking:     Resistance braking rate (%)
- * @torque_overload: Torque overload ratio (%)
- * @period:          How often Modbus is polled
- * @modbus_errors:   Amount of Modbus errors
- */
+/** Signals, pins and parameters from LinuxCNC and HAL */
 struct haldata {
     /* Info from driver */
-    hal_float_t     *commanded_speed;
-    hal_float_t     *feedback_speed;
-    hal_float_t     *deviation_speed;
-    hal_float_t     *dc_bus_volt;
-    hal_float_t     *torque_load;
-    hal_float_t     *res_braking;
-    hal_float_t     *torque_overload;
+    hal_float_t     *commanded_speed;   /**< commanded speed (RPM) */
+    hal_float_t     *feedback_speed;    /**< feedback speed (RPM) */
+    hal_float_t     *deviation_speed;   /**< speed deviation (RPM) */
+    hal_float_t     *dc_bus_volt;       /**< DC bus voltage (V) */
+    hal_float_t     *torque_load;       /**< torque load ratio (%) */
+    hal_float_t     *res_braking;       /**< resistance braking rate (%) */
+    hal_float_t     *torque_overload;   /**< torque overload ratio (%) */
 
     /* Parameter */
-    hal_float_t     period;
-    hal_s32_t       modbus_errors;
+    hal_float_t     period;             /**< How often Modbus is polled */
+    hal_s32_t       modbus_errors;      /**< Amount of Modbus errors */
 };
 
 int hal_comp_id;
@@ -174,15 +163,11 @@ void usage(char **argv)
         } while (0)
 
 /**
- * hal_setup - Declare haldata pins.
- * @id:     HAL component id.
- * @h:      haldata that contain all the pins.
- * @name:   Name of the HAL module.
- *
- * Declare haldata variables, and link them to LinuxCNC. Use the macro 'PIN'
- * to shorten the typing.
- *
- * Return: 0 on success, non-zero otherwise.
+ * @brief Create HAL pins.
+ * @param id Component ID created by HAL.
+ * @param h Information to and from, LinuxCNC.
+ * @param name Name of the HAL module.
+ * @return 0 on success, non-zero otherwise.
  */
 static int hal_setup(int id, struct haldata *h, const char *name)
 {
@@ -204,12 +189,9 @@ static int hal_setup(int id, struct haldata *h, const char *name)
 #undef PIN
 
 /**
- * set_haldata_defaults - Initialize HAL data variables.
- * @haldata: Contains all the pins.
- *
- * Initialize all variables to the correct value.
- *
- * Return: 0 on success
+ * @brief Initialize HAL data variables.
+ * @param haldata Information to and from, LinuxCNC.
+ * @return 0 on success
  */
 static int set_haldata_defaults(struct haldata *haldata)
 {
