@@ -22,6 +22,8 @@
 #include <thread>
 
 #include <modbus.h>
+#include <sstream>
+#include <list>
 
 #include "hal.h"
 
@@ -136,15 +138,16 @@ void usage(char *argv[])
               << "   Currently this only monitor the Lichuan servo driver.\n"
               << "\n"
               << "Optional arguments:\n"
-              << "   -d, --device <path> (default: /dev/ttyUSB0)\n"
+              << "   -d, --device <path> (default: '/dev/ttyUSB0')\n"
               << "       Set the name of the serial device to use\n"
-              << "   -n, --name <string> (default: lichuan_a4)\n"
+              << "   -n, --name <strings> (default: 'lichuan_a4')\n"
               << "       Set the name of the HAL module. The HAL comp name will be set to <string>, and all pin\n"
-              << "       and parameter names will begin with <string>.\n"
+              << "       and parameter names will begin with <string>. If multiple names is given, multiple\n"
+              << "       HAL modules will be created.\n"
               << "   -r, --rate <n> (default: 19200)\n"
               << "       Set baud rate to <n>. It is an error if the rate is not one of the following:\n"
-              << "       2400, 4800, 9600, 19200, 38400, 57600, 115200\n"
-              << "   -t, --target <n> (default: 1)\n"
+              << "       [2400, 4800, 9600, 19200, 38400, 57600, 115200]\n"
+              << "   -t, --target <integers> (default: 1)\n"
               << "       Set Modbus target number. This must match the device\n"
               << "       number you set on the Lichuan servo driver.\n"
               << "   -v, --verbose\n"
@@ -205,10 +208,45 @@ static int set_haldata_defaults(Hal_data *hal)
     return 0;
 }
 
+static bool try_parse(const std::string& str, int& result) {
+    std::istringstream iss(str);
+    return (iss >> result) && iss.eof();
+}
+
+static std::string trim(const std::string& str) {
+    std::size_t first = str.find_first_not_of(" \t\n\r");
+    std::size_t last = str.find_last_not_of(" \t\n\r");
+    return (first != std::string::npos && last != std::string::npos) ? str.substr(first, last - first + 1) : "";
+}
+
+template<typename T>
+static std::list<T> parse_arguments(const std::string& input) {
+    std::list<T> values;
+    std::istringstream iss(input);
+    std::string token;
+    while (std::getline(iss, token, ',')) {
+        if constexpr (std::is_same_v<T, std::string>)
+            values.push_back(trim(token));
+
+        if constexpr (std::is_same_v<T, int>) {
+            int value;
+            if (try_parse(token, value)) {
+                values.push_back(value);
+            } else {
+                std::cerr << "ERROR: Invalid input in 'target' option: " << token << "\n";
+                break;
+            }
+        }
+    }
+    return values;
+}
+
 int main(int argc, char *argv[])
 {
     Hal_data* haldata;
     Target_data targetdata;
+    std::list<std::string> hal_names { "lichuan_a4" };
+    std::list<int> targets { 1 };
     //struct timespec period_timespec;
 
     /* Default Modbus values */
@@ -231,11 +269,7 @@ int main(int argc, char *argv[])
                 device = optarg;
                 break;
             case 'n': /* Module base name */
-                if (strlen(optarg) > HAL_NAME_LEN - 20) {
-                    std::cerr << "ERROR: HAL module name to long: " << optarg <<"\n";
-                    exit(-1);
-                }
-                modname = strdup(optarg);
+                hal_names = parse_arguments<std::string>(optarg);
                 break;
             case 'r': /* Baud rate */
                 {
@@ -248,15 +282,7 @@ int main(int argc, char *argv[])
                 }
                 break;
             case 't': /* Target number */
-                {
-                    char* endarg;
-                    const int arg_value = static_cast<int>(strtol(optarg, &endarg, 10));
-                    if ((*endarg != '\0') || (arg_value < 1) || (arg_value > 31)) {
-                        std::cerr << "ERROR: invalid target number: " << optarg << "\n";
-                        exit(-1);
-                    }
-                    target = arg_value;
-                }
+                targets = parse_arguments<int>(optarg);
                 break;
             case 'v':
                 verbose = true;
@@ -268,6 +294,11 @@ int main(int argc, char *argv[])
                 usage(argv);
                 exit(1);
         }
+    }
+
+    if (hal_names.size() != targets.size()) {
+        std::cerr << "ERROR: 'name' and 'target' must have the same number of arguments\n";
+        exit(-1);
     }
 
     std::cout << modname << ": device='" << device << "', baud=" << baud
