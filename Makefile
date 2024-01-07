@@ -10,7 +10,7 @@ LDLIBS := -lmodbus -llinuxcnchal -lm
 LDFLAGS := -Wl,-z,now -Wl,-z,relro
 
 BIN = lichuan_a4
-SRCS = lichuan_a4.c
+SRCS = lichuan_a4.cpp
 OBJS = $(patsubst %.c,%.o, $(SRCS))
 
 prefix = /usr/local
