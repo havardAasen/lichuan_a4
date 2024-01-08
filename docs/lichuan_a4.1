@@ -1,0 +1,110 @@
+.TH LICHUAN_A4 1 2024-01-08 "Lichuan A4 servo driver"
+.SH NAME
+lichuan_a4 \- LinuxCNC HAL userspace component for Lichuan A4 servo driver
+.SH SYNOPSIS
+.B lichuan_a4
+.RB [ -h|--help ]
+.RB [ -d|--device\ \fIpath\fR ]
+.RB [ -n|--name\ \fIname[,...]\fR ]
+.RB [ -r|--rate\ \fIrate\fR ]
+.RB [ -v|--verbose ]
+.RB [ -t|--target\ \fItarget[,...]\fR ]
+.SH DESCRIPTION
+This component connects the Lichuan A4 servo driver via serial
+(RS-485) connection.
+.PP
+This driver is implemented in userspace, as such it is not suitable for
+controlling the servo motor with the precision that is expected. This driver is
+meant to read status, errors and to read and write digital inputs and outputs.
+.PP
+To ensure a successful connection, you need to adjust the parameters in the
+driver to match the configuration in the software. The only adjustable
+parameters are the communication address and baud rate. The data bits, stop bit,
+and parity settings are not changeable and are fixed at 8E1, which means 8 data
+bits, 1 stop bit, and even parity.
+.PP
+The parameters that has to be configured on Lichuan A4 servo driver is:
+.TP
+.BI PA_000\ \=\ 1
+Set register to 1, which is the default Modbus \fItarget\fR.
+.PP
+.TP
+.BI PA_00D\ \=\ 3
+Set register to 3, which is the default \fIrate\fR for Lichuan A4 driver.
+.PP
+.PP
+Consult the Lichuan A4 instruction manual for details on configuring the device
+and alternative values for the above registers.
+.SH OPTIONS
+Options set on the command line will overwrite the default settings.
+.TP
+.BI -h\ --help
+Show options and exit.
+.PP
+.TP
+.BI -d\ --device " path"
+(default /dev/ttyUSB0) Set the name of the serial device node to use.
+.PP
+.TP
+.BI -n\ --name " name,..."
+(default lichuan_a4) Set the name of the HAL module. The HAL component name will
+be set to \fIname\fR and all pin and parameter names will begin with
+\fIname\fR. If you connect multiple drives, they should have unique names, it
+is required that \fItarget\fB has the same number of elements.
+.PP
+.TP
+.BI -r\ --rate " rate"
+(default 19200) Set baud rate to \fIrate\fR. It is an error if the baud rate is
+not one of the following: 2400, 4800, 9600, 19200, 38400, 57600, 115200. This
+must match the setting in register PA_00D of the Lichuan A4 driver. If you have
+connected multiple drives, they must all have the same baud rate.
+.PP
+.TP
+.BI -v\ --verbose
+Turn on verbose messages. Note that if there are serial errors, this may
+become annoying. Verbose mode will cause all serial communication messages
+.PP
+.TP
+.BI -t\ --target " target,..."
+(default 1) Set Modbus target number. This must match the address you set on the
+Lichuan A4 driver in register PA_000. If you connect multiple drives, they must
+have unique numbers, it is required that \fIname\fR has the same number of
+elements.
+.SH PINS
+Where \fIname\fR is set with option \fB-n\fR, \fB--name\fR or default value.
+.TP
+.RB \fIname\fR ".commanded-speed " (float,\ out)
+from the VFD
+.PP
+.TP
+.RB \fIname\fR ".feedback-speed " (float,\ out)
+from the VFD
+.PP
+.TP
+.RB \fIname\fR ".deviation-speed " (float,\ out)
+from the VFD
+.PP
+.TP
+.RB \fIname\fR ".dc-bus-volt " (float,\ out)
+from the VFD
+.PP
+.TP
+.RB \fIname\fR ".torque-load " (float,\ out)
+from the VFD
+.PP
+.TP
+.RB \fIname\fR ".res-braking" (float,\ out)
+from the VFD
+.PP
+.TP
+.RB \fIname\fR ".torque-overload " (float,\ out)
+from the VFD
+.SH PARAMETERS
+Where \fIname\fR is set with option \fB-n\fR, \fB--name\fR or default value.
+.TP
+\fIname\fR.\fBmodbus-read-freq\fR (float,\ rw)
+(default 1.0) How often the Modbus target is read and written to.
+.PP
+.TP
+\fIname\fR.\fBmodbus-errors\fR (s32,\ ro)
+Modbus error count.

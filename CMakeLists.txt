@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(lichuan_a4)
 
+include(GNUInstallDirs)
+
 set(CMAKE_CXX_STANDARD 17)
 add_compile_options(-Wall -Wextra -Weffc++ -Wsign-conversion)
 
@@ -21,3 +23,4 @@ target_link_libraries(lichuan_a4
         linuxcnchal
         ${LIBMODBUS_LIBRARIES}
 )
+add_subdirectory(docs)
