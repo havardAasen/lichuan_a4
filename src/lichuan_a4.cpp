@@ -102,31 +102,33 @@ int Lichuan_a4::read_data()
     return -1;
 }
 
-#define PIN(x)\
-        do {\
-            status = (x);\
-            if (status != 0) return status;\
-        } while (0)
 int Lichuan_a4::create_hal_pins() const noexcept
 {
-    int status;
     const int id = target.hal_comp_id;
+    const char *hal_name = target.hal_name.c_str();
 
-    PIN(hal_pin_float_newf(HAL_OUT, &hal->commanded_speed, id, "%s.commanded-speed", target.hal_name.c_str()));
-    PIN(hal_pin_float_newf(HAL_OUT, &hal->feedback_speed, id, "%s.feedback-speed", target.hal_name.c_str()));
-    PIN(hal_pin_float_newf(HAL_OUT, &hal->deviation_speed, id, "%s.deviation-speed", target.hal_name.c_str()));
-    PIN(hal_pin_float_newf(HAL_OUT, &hal->dc_bus_volt, id, "%s.dc-bus-volt", target.hal_name.c_str()));
-    PIN(hal_pin_float_newf(HAL_OUT, &hal->torque_load, id, "%s.torque-load", target.hal_name.c_str()));
-    PIN(hal_pin_float_newf(HAL_OUT, &hal->res_braking, id, "%s.res-braking", target.hal_name.c_str()));
-    PIN(hal_pin_float_newf(HAL_OUT, &hal->torque_overload, id, "%s.torque-overload", target.hal_name.c_str()));
+    int retval = hal_pin_float_newf(HAL_OUT, &hal->commanded_speed, id, "%s.commanded-speed", hal_name);
+    if (retval != 0) return -1;
+    retval = hal_pin_float_newf(HAL_OUT, &hal->feedback_speed, id, "%s.feedback-speed", hal_name);
+    if (retval != 0) return -1;
+    retval = hal_pin_float_newf(HAL_OUT, &hal->deviation_speed, id, "%s.deviation-speed", hal_name);
+    if (retval != 0) return -1;
+    retval = hal_pin_float_newf(HAL_OUT, &hal->dc_bus_volt, id, "%s.dc-bus-volt", hal_name);
+    if (retval != 0) return -1;
+    retval = hal_pin_float_newf(HAL_OUT, &hal->torque_load, id, "%s.torque-load", hal_name);
+    if (retval != 0) return -1;
+    retval = hal_pin_float_newf(HAL_OUT, &hal->res_braking, id, "%s.res-braking", hal_name);
+    if (retval != 0) return -1;
+    retval = hal_pin_float_newf(HAL_OUT, &hal->torque_overload, id, "%s.torque-overload", hal_name);
+    if (retval != 0) return -1;
 
     // FIXME: The modbus_polling pin should be shared between all devices.
-    //PIN(hal_param_float_newf(HAL_RW, &hal->modbus_read_freq, id, "%s.modbus-polling", target.hal_name.c_str()));
-    PIN(hal_param_s32_newf(HAL_RO, &hal->modbus_errors, id, "%s.modbus-errors", target.hal_name.c_str()));
+    //retval = hal_param_float_newf(HAL_RW, &hal->modbus_read_freq, id, "%s.modbus-polling", hal_name);
+    //if (retval != 0) return -1;
+    retval = hal_param_s32_newf(HAL_RO, &hal->modbus_errors, id, "%s.modbus-errors", hal_name);
 
-    return 0;
+    return retval;
 }
-#undef PIN
 
 constexpr void Lichuan_a4::initialize_haldata() const noexcept
 {
