@@ -13,10 +13,10 @@
 #ifndef LICHUAN_A4_H
 #define LICHUAN_A4_H
 
-#include <string>
-
 #include <hal.h>
 #include <modbus.h>
+
+#include <string>
 
 
 inline constexpr int start_register_r { 0x01C0 };
@@ -49,8 +49,8 @@ struct Hal_data {
     hal_float_t     *torque_overload;   /*!< torque overload ratio [%] */
 
     // Parameters
-    hal_float_t  period;         /*!< How often Modbus is polled */
-    hal_s32_t    modbus_errors;  /*!< Amount of Modbus errors */
+    hal_float_t  modbus_polling;     /*!< Modbus polling frequency [s] */
+    hal_s32_t    modbus_errors;      /*!< Modbus error count */
 };
 
 
@@ -65,14 +65,14 @@ public:
     Lichuan_a4 &operator=(const Lichuan_a4 &) = delete;
 
 private:
-    Hal_data* hal;
+    Hal_data* hal{};
     Target_data target;
-    modbus_t* mb_ctx;
+    modbus_t* mb_ctx{};
 
     /** If a modbus transaction fails, retry this many times before giving up. */
     inline constexpr static int modbus_retries {5};
 
-    // Modbus settings hard-coded in servo driver
+    // Modbus settings, hard-coded in servo driver
     inline constexpr static int data_bits { 8 };
     inline constexpr static int stop_bits { 1 };
     inline constexpr static char parity { 'E' };
@@ -81,13 +81,8 @@ private:
      * @brief Create HAL pins.
      * @return 0 on success, non-zero otherwise.
      */
-    [[nodiscard]] constexpr int create_hal_pins() const noexcept;
-
-    /**
-     * @brief Initialize HAL data variables.
-     * @return 0 on success
-     */
-    constexpr void set_default_haldata() const noexcept;
+    [[nodiscard]] int create_hal_pins() const noexcept;
+    constexpr void initialize_haldata() const noexcept;
 };
 
 #endif // LICHUAN_A4_H

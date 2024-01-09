@@ -3,13 +3,13 @@
  * Copyright (C) 2022-2024 Håvard F. Aasen <havard.f.aasen@pfft.no>
  */
 
-#include <cerrno>
+#include "lichuan_a4.h"
 
+#include <cerrno>
 #include <iostream>
 #include <string>
 #include <sstream>
 
-#include "lichuan_a4.h"
 
 Lichuan_a4::Lichuan_a4(Target_data& target) : target{ target }
 {
@@ -64,7 +64,7 @@ Lichuan_a4::Lichuan_a4(Target_data& target) : target{ target }
         throw std::runtime_error(oss.str());
     }
 
-    set_default_haldata();
+    initialize_haldata();
     hal_ready(target.hal_comp_id);
 }
 
@@ -107,9 +107,9 @@ int Lichuan_a4::read_data()
             status = (x);\
             if (status != 0) return status;\
         } while (0)
-constexpr int Lichuan_a4::create_hal_pins() const noexcept
+int Lichuan_a4::create_hal_pins() const noexcept
 {
-    int status { 0 };
+    int status;
     const int id = target.hal_comp_id;
 
     PIN(hal_pin_float_newf(HAL_OUT, &hal->commanded_speed, id, "%s.commanded-speed", target.hal_name.c_str()));
@@ -120,15 +120,15 @@ constexpr int Lichuan_a4::create_hal_pins() const noexcept
     PIN(hal_pin_float_newf(HAL_OUT, &hal->res_braking, id, "%s.res-braking", target.hal_name.c_str()));
     PIN(hal_pin_float_newf(HAL_OUT, &hal->torque_overload, id, "%s.torque-overload", target.hal_name.c_str()));
 
-    // FIXME: The period pin should be shared between all devices.
-    //PIN(hal_param_float_newf(HAL_RW, &hal->period, id, "%s.period-seconds", target.hal_name.c_str()));
+    // FIXME: The modbus_polling pin should be shared between all devices.
+    //PIN(hal_param_float_newf(HAL_RW, &hal->modbus_read_freq, id, "%s.modbus-polling", target.hal_name.c_str()));
     PIN(hal_param_s32_newf(HAL_RO, &hal->modbus_errors, id, "%s.modbus-errors", target.hal_name.c_str()));
 
     return 0;
 }
 #undef PIN
 
-constexpr void Lichuan_a4::set_default_haldata() const noexcept
+constexpr void Lichuan_a4::initialize_haldata() const noexcept
 {
     *hal->commanded_speed = 0;
     *hal->feedback_speed = 0;
@@ -138,6 +138,6 @@ constexpr void Lichuan_a4::set_default_haldata() const noexcept
     *hal->res_braking = 0;
     *hal->torque_overload = 0;
 
-    //hal->period = 2.0;
+    //hal->modbus_polling = 1.0;
     hal->modbus_errors = 0;
 }
