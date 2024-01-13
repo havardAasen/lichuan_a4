@@ -11,7 +11,7 @@
 #include <sstream>
 
 
-Lichuan_a4::Lichuan_a4(Target_data& target) : target{ target }
+Lichuan_a4::Lichuan_a4(Target_data& _target) : target{ _target }
 {
     std::cout << target.hal_name << ": device='" << target.device << "', baud=" << target.baud_rate
               << ", bits=" << data_bits << ", parity='" << parity << "', stopbits="
@@ -25,7 +25,7 @@ Lichuan_a4::Lichuan_a4(Target_data& target) : target{ target }
         throw std::runtime_error(oss.str());
     }
 
-    if (!modbus_connect(mb_ctx)) {
+    if (modbus_connect(mb_ctx) != 0) {
         modbus_free(mb_ctx);
         std::ostringstream oss;
         oss << target.hal_name << ": ERROR: Can't connect to serial device:"
@@ -123,8 +123,8 @@ int Lichuan_a4::create_hal_pins() const noexcept
     if (retval != 0) return -1;
 
     // FIXME: The modbus_polling pin should be shared between all devices.
-    //retval = hal_param_float_newf(HAL_RW, &hal->modbus_read_freq, id, "%s.modbus-polling", hal_name);
-    //if (retval != 0) return -1;
+    retval = hal_param_float_newf(HAL_RW, &hal->modbus_polling, id, "%s.modbus-polling", hal_name);
+    if (retval != 0) return -1;
     retval = hal_param_s32_newf(HAL_RO, &hal->modbus_errors, id, "%s.modbus-errors", hal_name);
 
     return retval;
@@ -140,6 +140,6 @@ constexpr void Lichuan_a4::initialize_haldata() const noexcept
     *hal->res_braking = 0;
     *hal->torque_overload = 0;
 
-    //hal->modbus_polling = 1.0;
+    hal->modbus_polling = 1.0;
     hal->modbus_errors = 0;
 }

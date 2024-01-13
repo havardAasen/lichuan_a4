@@ -56,7 +56,7 @@ struct Hal_data {
 
 class Lichuan_a4 {
 public:
-    explicit Lichuan_a4(Target_data& target);
+    explicit Lichuan_a4(Target_data& _target);
     ~Lichuan_a4();
 
     int read_data();
@@ -70,12 +70,12 @@ private:
     modbus_t* mb_ctx{};
 
     /** If a modbus transaction fails, retry this many times before giving up. */
-    inline constexpr static int modbus_retries {5};
+    static constexpr int modbus_retries {5};
 
     // Modbus settings, hard-coded in servo driver
-    inline constexpr static int data_bits { 8 };
-    inline constexpr static int stop_bits { 1 };
-    inline constexpr static char parity { 'E' };
+    static constexpr int data_bits { 8 };
+    static constexpr int stop_bits { 1 };
+    static constexpr char parity { 'E' };
 
     /**
      * @brief Create HAL pins.
