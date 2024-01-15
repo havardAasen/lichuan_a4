@@ -181,16 +181,21 @@ int main(int argc, char *argv[])
         //std::chrono::nanoseconds period_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(period_duration);
         std::this_thread::sleep_for(std::chrono::seconds{1});
 
-        //for (auto& servo : devices) {
-        //    std::cout << servo.target.hal_name << ": Commanded speed: " << servo.hal->commanded_speed << "\n";
-        //}
+        for (auto& servo : devices) {
+            servo.read_data();
+            std::cout << "commanded speed: " << servo.hal->commanded_speed << "\n";
+            std::cout << "feedback speed: " << servo.hal->feedback_speed << "\n";
+            std::cout << "dc bus volt: " << servo.hal->dc_bus_volt << "\n";
+            std::cout << "modbus errors: " << servo.hal->modbus_errors << "\n";
+            std::cout << "torque load: " << servo.hal->torque_load << "\n";
+            std::cout << "torque overload: " << servo.hal->torque_overload << "\n";
+        }
 
         /* Debug strings */
         //printf("Feedback speed: %f\n", *haldata->feedback_speed);
         //printf("Deviation speed: %f\n", *haldata->deviation_speed);
         //printf("Modbus-errors: %d\n", haldata->modbus_errors);
         //printf("\n");
-        done = -1;
     }
 
     return 0;
