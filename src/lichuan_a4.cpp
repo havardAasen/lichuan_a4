@@ -22,7 +22,7 @@ Lichuan_a4::Lichuan_a4(Target_data _target)
         throw std::runtime_error(oss.str());
     }
 
-    hal = static_cast<struct Hal_data*>(hal_malloc(sizeof(struct Hal_data)));
+    hal = static_cast<Hal_data*>(hal_malloc(sizeof(Hal_data)));
     if (!hal) {
         std::ostringstream oss;
         oss << target.hal_name << ": ERROR: Unable to allocate shared memory\n";
@@ -36,7 +36,7 @@ Lichuan_a4::Lichuan_a4(Target_data _target)
         throw std::runtime_error(oss.str());
     }
 
-    initialize_haldata();
+    Hal_data::initialize_data(hal);
     hal_ready(target.hal_comp_id);
 }
 
@@ -132,7 +132,7 @@ int Lichuan_a4::create_hal_pins() const noexcept
     return 0;
 }
 
-constexpr void Lichuan_a4::initialize_haldata() const noexcept
+constexpr void Hal_data::initialize_data(Hal_data *hal) noexcept
 {
     *hal->commanded_speed = 0;
     *hal->feedback_speed = 0;

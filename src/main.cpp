@@ -183,12 +183,6 @@ int main(int argc, char *argv[])
 
         for (auto& servo : devices) {
             servo.read_data();
-            std::cout << "commanded speed: " << servo.hal->commanded_speed << "\n";
-            std::cout << "feedback speed: " << servo.hal->feedback_speed << "\n";
-            std::cout << "dc bus volt: " << servo.hal->dc_bus_volt << "\n";
-            std::cout << "modbus errors: " << servo.hal->modbus_errors << "\n";
-            std::cout << "torque load: " << servo.hal->torque_load << "\n";
-            std::cout << "torque overload: " << servo.hal->torque_overload << "\n";
         }
 
         /* Debug strings */
