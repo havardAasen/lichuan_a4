@@ -50,7 +50,7 @@ std::vector<uint16_t> Modbus::readRegisters(const int address, const int count) 
         return data;
     }
 
-    uint16_t data_temp[count];
+    uint16_t data_temp[static_cast<unsigned int>(count)];
     int retval = modbus_read_registers(mb_ctx, address, count, data_temp);
     if (retval == count) {
         data.reserve(static_cast<size_t>(count));
