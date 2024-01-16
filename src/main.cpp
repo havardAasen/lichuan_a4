@@ -158,15 +158,10 @@ int main(int argc, char *argv[])
 
     std::list<Lichuan_a4> devices;
     for (const auto& name : hal_names) {
-        Target_data servo_data;
-        servo_data.device = device;
-        servo_data.baud_rate = baud;
-        servo_data.hal_name = name;
-        servo_data.verbose = verbose;
-        servo_data.target = targets.front();
+        const int target = targets.front();
         targets.pop_front();
         try {
-            devices.emplace_back(servo_data);
+            devices.emplace_back(name, device, target, baud, verbose);
         } catch (std::runtime_error& error) {
             std::cerr << error.what();
             exit(-1);

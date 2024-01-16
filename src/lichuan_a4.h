@@ -43,24 +43,13 @@ enum class Error_code{
     analog_command_overvoltage,
 };
 
-/** Target and registers to read from. */
-struct Target_data {
-    std::string hal_name{};
-    int hal_comp_id{};
-
-    // Modbus values
-    std::string device{};
-    int target{};               /*!< address of device to read from */
-    int baud_rate{19200};
-    bool verbose{false};
-};
 
 class Hal_data;
 
 
 class Lichuan_a4 {
 public:
-    explicit Lichuan_a4(Target_data _target);
+    Lichuan_a4(std::string_view _hal_name, std::string_view _device, int _target, int _baud_rate = 19200, bool _verbose = false);
     ~Lichuan_a4();
     Lichuan_a4(const Lichuan_a4 &) = delete;
     Lichuan_a4 &operator=(const Lichuan_a4 &) = delete;
@@ -70,11 +59,15 @@ public:
     [[nodiscard]] static constexpr std::string_view get_error_message(Error_code code) noexcept;
 
 private:
-    Hal_data* hal{};
-    Target_data target;
-    Modbus mb_ctx;
-
+    std::string hal_name;
+    int hal_comp_id;
     Error_code error_code{Error_code::no_error};
+    int target; /*!< address of Modbus device to read from */
+    int baud_rate;
+    bool verbose;
+    std::string device;
+    Hal_data* hal{};
+    Modbus mb_ctx;
 
     /** If a modbus transaction fails, retry this many times before giving up. */
     static constexpr int modbus_retries {5};
