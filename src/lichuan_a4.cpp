@@ -42,7 +42,10 @@ Lichuan_a4::Lichuan_a4(Target_data _target)
 
 Lichuan_a4::~Lichuan_a4()
 {
-    hal_exit(target.hal_comp_id);
+    int ret = hal_exit(target.hal_comp_id);
+    if (ret < 0) {
+        std::cerr << target.hal_name << ": ERROR: hal_exit() failed with code " << ret << "\n";
+    }
 }
 
 void Lichuan_a4::read_data()
