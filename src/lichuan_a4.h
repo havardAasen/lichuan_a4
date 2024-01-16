@@ -61,6 +61,8 @@ private:
     static constexpr int digital_IO_reg_count {2};
     static constexpr int speed_start_reg {448};
     static constexpr int speed_reg_count {3};
+    static constexpr int torque_start_reg {451};
+    static constexpr int torque_reg_count {3};
 
     /**
      * @brief Create HAL pins.
@@ -69,6 +71,7 @@ private:
     [[nodiscard]] int create_hal_pins() const noexcept;
 
     void read_speed_data();
+    void read_torque_data();
     void read_digital_IO();
 };
 
@@ -85,6 +88,10 @@ private:
     hal_float_t     *feedback_speed{};  /*!< feedback speed [RPM] */
     hal_float_t     *deviation_speed{}; /*!< deviation between command and
                                              feedback speed [RPM] */
+    hal_float_t     *commanded_torque{}; /*!< commanded torque [0.1%] */
+    hal_float_t     *feedback_torque{};  /*!< feedback torque [0.1%] */
+    hal_float_t     *deviation_torque{}; /*!< deviation between command and
+                                              feedback torque [0.1%] */
     hal_float_t     *dc_bus_volt{};     /*!< DC bus voltage [V] */
     hal_float_t     *torque_load{};     /*!< torque load ratio [%] */
     hal_float_t     *res_braking{};     /*!< resistance braking rate [%] */

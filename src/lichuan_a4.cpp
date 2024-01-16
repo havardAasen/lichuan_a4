@@ -51,6 +51,7 @@ Lichuan_a4::~Lichuan_a4()
 void Lichuan_a4::read_data()
 {
     read_speed_data();
+    read_torque_data();
     read_digital_IO();
 }
 
@@ -64,6 +65,21 @@ void Lichuan_a4::read_speed_data()
             *hal->commanded_speed = static_cast<int16_t>(data[0]);
             *hal->feedback_speed = static_cast<int16_t>(data[1]);
             *hal->deviation_speed = static_cast<int16_t>(data[2]);
+            return;
+        }
+        hal->modbus_errors++;
+    }
+}
+
+void Lichuan_a4::read_torque_data()
+{
+    for (int retries = 0; retries < modbus_retries; retries++) {
+        const auto data = mb_ctx.readRegisters(torque_start_reg, torque_reg_count);
+
+        if (data.size() == torque_reg_count) {
+            *hal->commanded_torque = data[0] / 10.0;
+            *hal->feedback_torque = data[1] / 10.0;
+            *hal->deviation_torque = data[2] / 10.0;
             return;
         }
         hal->modbus_errors++;
@@ -107,6 +123,9 @@ int Lichuan_a4::create_hal_pins() const noexcept
     if (hal_pin_float_newf(HAL_OUT, &hal->commanded_speed, id, "%s.commanded-speed", hal_name) != 0) return -1;
     if (hal_pin_float_newf(HAL_OUT, &hal->feedback_speed, id, "%s.feedback-speed", hal_name) != 0) return -1;
     if (hal_pin_float_newf(HAL_OUT, &hal->deviation_speed, id, "%s.deviation-speed", hal_name) != 0) return -1;
+    if (hal_pin_float_newf(HAL_OUT, &hal->commanded_torque, id, "%s.commanded-torque", hal_name) != 0) return -1;
+    if (hal_pin_float_newf(HAL_OUT, &hal->feedback_torque, id, "%s.feedback-torque", hal_name) != 0) return -1;
+    if (hal_pin_float_newf(HAL_OUT, &hal->deviation_torque, id, "%s.deviation-torque", hal_name) != 0) return -1;
     if (hal_pin_float_newf(HAL_OUT, &hal->dc_bus_volt, id, "%s.dc-bus-volt", hal_name) != 0) return -1;
     if (hal_pin_float_newf(HAL_OUT, &hal->torque_load, id, "%s.torque-load", hal_name) != 0) return -1;
     if (hal_pin_float_newf(HAL_OUT, &hal->res_braking, id, "%s.res-braking", hal_name) != 0) return -1;
@@ -140,6 +159,9 @@ constexpr void Hal_data::initialize_data(Hal_data *hal) noexcept
     *hal->commanded_speed = 0;
     *hal->feedback_speed = 0;
     *hal->deviation_speed = 0;
+    *hal->commanded_torque = 0;
+    *hal->feedback_torque = 0;
+    *hal->deviation_torque = 0;
     *hal->dc_bus_volt = 0;
     *hal->torque_load = 0;
     *hal->res_braking = 0;
