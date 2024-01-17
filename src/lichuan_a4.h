@@ -14,8 +14,7 @@
 #define LICHUAN_A4_H
 
 #include "modbus.h"
-
-#include <hal.h>
+#include "hal.h"
 
 #include <string>
 
@@ -44,15 +43,9 @@ enum class Error_code{
 };
 
 
-class Hal_data;
-
-
 class Lichuan_a4 {
 public:
     Lichuan_a4(std::string_view _hal_name, std::string_view _device, int _target, int _baud_rate = 19200, bool _verbose = false);
-    ~Lichuan_a4();
-    Lichuan_a4(const Lichuan_a4 &) = delete;
-    Lichuan_a4 &operator=(const Lichuan_a4 &) = delete;
 
     void read_data();
     [[nodiscard]] Error_code get_current_error() const noexcept;
@@ -60,13 +53,12 @@ public:
 
 private:
     std::string hal_name;
-    int hal_comp_id;
     Error_code error_code{Error_code::no_error};
     int target; /*!< address of Modbus device to read from */
     int baud_rate;
     bool verbose;
     std::string device;
-    Hal_data* hal{};
+    HAL hal;
     Modbus mb_ctx;
 
     /** If a modbus transaction fails, retry this many times before giving up. */
@@ -86,62 +78,12 @@ private:
     static constexpr int torque_start_reg {451};
     static constexpr int torque_reg_count {3};
 
-    /**
-     * @brief Create HAL pins.
-     * @return 0 on success, non-zero otherwise.
-     */
-    [[nodiscard]] int create_hal_pins() const noexcept;
-
     void read_speed_data();
     void read_torque_data();
     void read_digital_IO();
     void update_internal_state();
     void read_error_code();
     void print_error_message();
-};
-
-/** Signals, pins and parameters from LinuxCNC and HAL */
-class Hal_data {
-private:
-    Hal_data() = default;
-    friend class Lichuan_a4;
-
-    static constexpr void initialize_data(Hal_data *hal) noexcept;
-
-    // Info from driver
-    hal_float_t     *commanded_speed{}; /*!< commanded speed [RPM] */
-    hal_float_t     *feedback_speed{};  /*!< feedback speed [RPM] */
-    hal_float_t     *deviation_speed{}; /*!< deviation between command and
-                                             feedback speed [RPM] */
-    hal_float_t     *commanded_torque{}; /*!< commanded torque [0.1%] */
-    hal_float_t     *feedback_torque{};  /*!< feedback torque [0.1%] */
-    hal_float_t     *deviation_torque{}; /*!< deviation between command and
-                                              feedback torque [0.1%] */
-    hal_float_t     *dc_bus_volt{};     /*!< DC bus voltage [V] */
-    hal_float_t     *torque_load{};     /*!< torque load ratio [%] */
-    hal_float_t     *res_braking{};     /*!< resistance braking rate [%] */
-    hal_float_t     *torque_overload{}; /*!< torque overload ratio [%] */
-    hal_s32_t       *error_code{};
-
-    // Digital IO is configurable from driver
-    hal_bit_t       *digital_in0{};
-    hal_bit_t       *digital_in1{};
-    hal_bit_t       *digital_in2{};
-    hal_bit_t       *digital_in3{};
-    hal_bit_t       *digital_in4{};
-    hal_bit_t       *digital_in5{};
-    hal_bit_t       *digital_in6{};
-    hal_bit_t       *digital_in7{};
-    hal_bit_t       *digital_out0{};
-    hal_bit_t       *digital_out1{};
-    hal_bit_t       *digital_out2{};
-    hal_bit_t       *digital_out3{};
-    hal_bit_t       *digital_out4{};
-    hal_bit_t       *digital_out5{};
-
-    // Parameters
-    hal_float_t  modbus_polling{};      /*!< Modbus polling frequency [s] */
-    hal_u32_t    modbus_errors{};       /*!< Modbus error count */
 };
 
 #endif // LICHUAN_A4_H
