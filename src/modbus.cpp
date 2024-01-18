@@ -36,10 +36,18 @@ Modbus::Modbus(const std::string &device, const int baud_rate, const int data_bi
     modbus_set_slave(mb_ctx, target);
 }
 
+Modbus& Modbus::operator=(Modbus&& other) noexcept
+{
+    mb_ctx = std::exchange(other.mb_ctx, nullptr);
+    return *this;
+}
+
 Modbus::~Modbus()
 {
-    modbus_close(mb_ctx);
-    modbus_free(mb_ctx);
+    if (!mb_ctx) {
+        modbus_close(mb_ctx);
+        modbus_free(mb_ctx);
+    }
 }
 
 std::vector<uint16_t> Modbus::readRegisters(const int address, const int count) const

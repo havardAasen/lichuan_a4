@@ -14,20 +14,19 @@
 #include <modbus.h>
 
 #include <string>
+#include <utility>
 #include <vector>
-#include <memory>
 
 
 class Modbus {
 public:
     Modbus(const std::string &device, int baud_rate, int data_bits, char parity, int stop_bits,
            int target, bool debug = false);
+    Modbus(const Modbus&) = delete;
+    Modbus &operator=(const Modbus&) = delete;
+    Modbus(Modbus&& other) noexcept : mb_ctx{std::exchange(other.mb_ctx, nullptr)} {};
+    Modbus& operator=(Modbus&& other) noexcept;
     ~Modbus();
-    Modbus(const Modbus &) = delete;
-    Modbus &operator=(const Modbus &) = delete;
-    // FIXME: We might want to allow move construction and assignment.
-    Modbus(Modbus &&) = delete;
-    Modbus &operator=(Modbus &&) = delete;
 
     [[nodiscard]] std::vector<uint16_t> readRegisters(int address, int count) const;
     int writeSingleRegister(int address, uint16_t value);
