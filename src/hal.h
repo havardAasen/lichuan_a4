@@ -69,10 +69,10 @@ private:
 
     /**
      * @brief Create HAL pins.
-     * @return 0 on success, non-zero otherwise.
+     * @return @c true on success, @c false otherwise.
      */
-    [[nodiscard]] int create_hal_pins() const noexcept;
     constexpr void initialize_data() noexcept;
+    [[nodiscard]] bool create_hal_pins() const noexcept;
 
 };
 
