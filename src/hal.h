@@ -20,6 +20,8 @@
 class HAL {
 public:
     explicit HAL(std::string_view _hal_name);
+    HAL(const HAL&) = delete;
+    HAL& operator=(const HAL&) = delete;
     ~HAL();
 
     /** Signals, pins and parameters from LinuxCNC and HAL */
