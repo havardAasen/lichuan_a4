@@ -28,7 +28,24 @@ public:
     Modbus& operator=(Modbus&& other) noexcept;
     ~Modbus();
 
+    /**
+     * @brief Write a single value to Modbus register.
+     *
+     * Modbus function code 0x06 (preset single register).
+     * @param address Modbus register address.
+     * @param value Value to write.
+     * @return @c true on successful write, otherwise @c false.
+     */
     bool write_register(int address, uint16_t value);
+
+    /**
+     * @brief Read Modbus registers.
+     *
+     * Modbus function code 0x03 (read holding registers).
+     * @param address Modbus register address.
+     * @param count Number of registers to read.
+     * @return On success, the received data, otherwise empty container.
+     */
     [[nodiscard]] std::vector<uint16_t> read_registers(int address, int count) const;
 
 private:

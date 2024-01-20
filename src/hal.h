@@ -37,17 +37,17 @@ public:
         hal_float_t     *torque_load{};         /*!< torque load ratio [%] */
         hal_float_t     *res_braking{};         /*!< resistance braking rate [%] */
         hal_float_t     *torque_overload{};     /*!< torque overload ratio [%] */
-        hal_s32_t       *error_code{};
+        hal_s32_t       *error_code{};          /*!< servo driver error code */
 
-        // Digital IO is configurable from driver, but we assume default settings
-        hal_bit_t       *digital_in0{};
-        hal_bit_t       *digital_in1{};
-        hal_bit_t       *digital_in2{};
-        hal_bit_t       *digital_in3{};
-        hal_bit_t       *digital_in4{};
-        hal_bit_t       *digital_in5{};
-        hal_bit_t       *digital_in6{};
-        hal_bit_t       *digital_in7{};
+        // Digital IO is configurable from driver, we assume default settings
+        hal_bit_t       *digital_in0{};     /*!< servo enabling */
+        hal_bit_t       *digital_in1{};     /*!< clear alarm */
+        hal_bit_t       *digital_in2{};     /*!< clockwise stroke limit */
+        hal_bit_t       *digital_in3{};     /*!< anticlockwise stroke limit */
+        hal_bit_t       *digital_in4{};     /*!< clear deviation counter to 0 */
+        hal_bit_t       *digital_in5{};     /*!< command pulse prohibition */
+        hal_bit_t       *digital_in6{};     /*!< torque limit switchover */
+        hal_bit_t       *digital_in7{};     /*!< start position of "back to zero" */
         hal_bit_t       *digital_out0{};    /*!< servo ready */
         hal_bit_t       *digital_out1{};    /*!< servo alarm */
         hal_bit_t       *digital_out2{};    /*!< location arrival */
