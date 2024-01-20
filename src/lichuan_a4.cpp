@@ -64,7 +64,7 @@ constexpr std::string_view Lichuan_a4::get_error_message(Error_code error_code) 
 void Lichuan_a4::read_speed_data()
 {
     for (int retries = 0; retries < modbus_retries; retries++) {
-        const auto data = mb_ctx.readRegisters(speed_start_reg, speed_reg_count);
+        const auto data = mb_ctx.read_registers(speed_start_reg, speed_reg_count);
 
         if (data.size() == speed_reg_count) {
             // Speed values can be negative.
@@ -80,7 +80,7 @@ void Lichuan_a4::read_speed_data()
 void Lichuan_a4::read_torque_data()
 {
     for (int retries = 0; retries < modbus_retries; retries++) {
-        const auto data = mb_ctx.readRegisters(torque_start_reg, torque_reg_count);
+        const auto data = mb_ctx.read_registers(torque_start_reg, torque_reg_count);
 
         if (data.size() == torque_reg_count) {
             *hal.data->commanded_torque = data[0] / 10.0;
@@ -95,7 +95,7 @@ void Lichuan_a4::read_torque_data()
 void Lichuan_a4::read_digital_IO()
 {
     for (int retries = 0; retries < modbus_retries; retries++) {
-        const auto data = mb_ctx.readRegisters(digital_IO_start_reg, digital_IO_reg_count);
+        const auto data = mb_ctx.read_registers(digital_IO_start_reg, digital_IO_reg_count);
 
         if (data.size() == digital_IO_reg_count) {
             const std::bitset<8> bits_in{data[0]};
@@ -134,7 +134,7 @@ void Lichuan_a4::update_internal_state()
 void Lichuan_a4::read_error_code()
 {
     for (int retries = 0; retries < modbus_retries; retries++) {
-        const auto data = mb_ctx.readRegisters(current_error_code_reg, single_register_count);
+        const auto data = mb_ctx.read_registers(current_error_code_reg, single_register_count);
 
         if (data.size() == single_register_count) {
             *hal.data->error_code = data[0];

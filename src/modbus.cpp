@@ -50,7 +50,7 @@ Modbus::~Modbus()
     }
 }
 
-std::vector<uint16_t> Modbus::readRegisters(const int address, const int count) const
+std::vector<uint16_t> Modbus::read_registers(const int address, const int count) const
 {
     // Modbus requires an array to read into, but we want to return a vector.
     std::vector<uint16_t> data{};
