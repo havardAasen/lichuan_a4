@@ -70,8 +70,7 @@ std::vector<uint16_t> Modbus::read_registers(const int address, const int count)
     return data;
 }
 
-int Modbus::writeSingleRegister(int address, uint16_t value)
+bool Modbus::write_register(const int address, const uint16_t value)
 {
     return modbus_write_register(mb_ctx, address, value);
-
 }

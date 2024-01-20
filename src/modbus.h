@@ -28,7 +28,7 @@ public:
     Modbus& operator=(Modbus&& other) noexcept;
     ~Modbus();
 
-    int writeSingleRegister(int address, uint16_t value);
+    bool write_register(int address, uint16_t value);
     [[nodiscard]] std::vector<uint16_t> read_registers(int address, int count) const;
 
 private:
