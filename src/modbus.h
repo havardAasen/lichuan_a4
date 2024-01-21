@@ -23,7 +23,7 @@ public:
     Modbus(const std::string &device, int baud_rate, int data_bits, char parity, int stop_bits,
            int target, bool debug = false);
     Modbus(const Modbus&) = delete;
-    Modbus &operator=(const Modbus&) = delete;
+    Modbus& operator=(const Modbus&) = delete;
     Modbus(Modbus&& other) noexcept : mb_ctx{std::exchange(other.mb_ctx, nullptr)} {};
     Modbus& operator=(Modbus&& other) noexcept;
     ~Modbus();

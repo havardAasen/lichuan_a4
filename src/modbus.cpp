@@ -27,7 +27,7 @@ Modbus::Modbus(const std::string &device, const int baud_rate, const int data_bi
     if (modbus_connect(mb_ctx) != 0) {
         modbus_free(mb_ctx);
         std::ostringstream oss;
-        oss << "ERROR: Can't connect to serial device:"
+        oss << "ERROR: Can't connect to serial device: "
             << modbus_strerror(errno) << "\n";
         throw std::runtime_error(oss.str());
     }

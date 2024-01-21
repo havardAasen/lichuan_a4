@@ -18,7 +18,7 @@
 
 #include <string>
 
-enum class Error_code{
+enum class Error_code {
     no_error = 0,
     system_error,
     DI_configuration_error,
