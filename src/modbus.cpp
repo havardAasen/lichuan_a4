@@ -44,7 +44,7 @@ Modbus& Modbus::operator=(Modbus&& other) noexcept
 
 Modbus::~Modbus()
 {
-    if (!mb_ctx) {
+    if (mb_ctx) {
         modbus_close(mb_ctx);
         modbus_free(mb_ctx);
     }
