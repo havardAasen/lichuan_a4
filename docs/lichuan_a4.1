@@ -1,4 +1,4 @@
-.TH LICHUAN_A4 1 2024-01-08 "Lichuan A4 servo driver"
+.TH LICHUAN_A4 1 2024-01-21 "Lichuan A4 servo driver"
 .SH NAME
 lichuan_a4 \- LinuxCNC HAL userspace component for Lichuan A4 servo driver
 .SH SYNOPSIS
@@ -10,18 +10,19 @@ lichuan_a4 \- LinuxCNC HAL userspace component for Lichuan A4 servo driver
 .RB [ -v|--verbose ]
 .RB [ -t|--target\ \fItarget[,...]\fR ]
 .SH DESCRIPTION
-This component connects the Lichuan A4 servo driver via serial
-(RS-485) connection.
+This component connects the Lichuan A4 servo driver via serial (RS-485)
+connection to LinuxCNC and provides a HAL interface.
 .PP
 This driver is implemented in userspace, as such it is not suitable for
-controlling the servo motor with the precision that is expected. This driver is
-meant to read status, errors and to read and write digital inputs and outputs.
+controlling the servo motor with the precision and speed that is expected. This
+driver is meant to read status, error codes and to read and write digital inputs
+and outputs.
 .PP
 To ensure a successful connection, you need to adjust the parameters in the
-driver to match the configuration in the software. The only adjustable
-parameters are the communication address and baud rate. The data bits, stop bit,
-and parity settings are not changeable and are fixed at 8E1, which means 8 data
-bits, 1 stop bit, and even parity.
+driver to match the configuration in the software. The communication address and
+baud rate are the sole configurable parameters. The data bits, stop bit, and
+parity settings remain unalterable and are set at 8E1, denoting 8 data bits, 1
+stop bit, and even parity.
 .PP
 The parameters that has to be configured on Lichuan A4 servo driver is:
 .TP
@@ -31,7 +32,6 @@ Set register to 1, which is the default Modbus \fItarget\fR.
 .TP
 .BI PA_00D\ \=\ 3
 Set register to 3, which is the default \fIrate\fR for Lichuan A4 driver.
-.PP
 .PP
 Consult the Lichuan A4 instruction manual for details on configuring the device
 and alternative values for the above registers.
@@ -46,65 +46,140 @@ Show options and exit.
 (default /dev/ttyUSB0) Set the name of the serial device node to use.
 .PP
 .TP
-.BI -n\ --name " name,..."
+.BI -n\ --name " name[,...]"
 (default lichuan_a4) Set the name of the HAL module. The HAL component name will
 be set to \fIname\fR and all pin and parameter names will begin with
 \fIname\fR. If you connect multiple drives, they should have unique names, it
-is required that \fItarget\fB has the same number of elements.
+is required that \fItarget\fR has the same number of elements.
 .PP
 .TP
 .BI -r\ --rate " rate"
 (default 19200) Set baud rate to \fIrate\fR. It is an error if the baud rate is
 not one of the following: 2400, 4800, 9600, 19200, 38400, 57600, 115200. This
-must match the setting in register PA_00D of the Lichuan A4 driver. If you have
+must match the setting in register \fBPA_00D\fR of the Lichuan A4 driver. If you have
 connected multiple drives, they must all have the same baud rate.
 .PP
 .TP
 .BI -v\ --verbose
 Turn on verbose messages. Note that if there are serial errors, this may
 become annoying. Verbose mode will cause all serial communication messages
+to be printed in hex on the terminal.
 .PP
 .TP
-.BI -t\ --target " target,..."
+.BI -t\ --target " target[,...]"
 (default 1) Set Modbus target number. This must match the address you set on the
-Lichuan A4 driver in register PA_000. If you connect multiple drives, they must
+Lichuan A4 driver in register \fBPA_000\fR. If you connect multiple drives, they must
 have unique numbers, it is required that \fIname\fR has the same number of
 elements.
 .SH PINS
 Where \fIname\fR is set with option \fB-n\fR, \fB--name\fR or default value.
 .TP
-.RB \fIname\fR ".commanded-speed " (float,\ out)
-from the VFD
+\fIname\fR.\fBcommanded-speed\fR (float, out)
+commanded speed [RPM]
 .PP
 .TP
-.RB \fIname\fR ".feedback-speed " (float,\ out)
-from the VFD
+\fIname\fR.\fBfeedback-speed\fR (float, out)
+feedback speed [RPM]
 .PP
 .TP
-.RB \fIname\fR ".deviation-speed " (float,\ out)
-from the VFD
+\fIname\fR.\fBdeviation-speed\fR (float, out)
+deviation between command and feedback speed [RPM]
 .PP
 .TP
-.RB \fIname\fR ".dc-bus-volt " (float,\ out)
-from the VFD
+\fIname\fR.\fBcommanded-torque\fR (float, out)
+commanded torque [0.1%]
 .PP
 .TP
-.RB \fIname\fR ".torque-load " (float,\ out)
-from the VFD
+\fIname\fR.\fBfeedback-torque\fR (float, out)
+feedback torque [0.1%]
 .PP
 .TP
-.RB \fIname\fR ".res-braking" (float,\ out)
-from the VFD
+\fIname\fR.\fBdeviation-torque\fR (float, out)
+deviation between command and feedback torque [0.1%]
 .PP
 .TP
-.RB \fIname\fR ".torque-overload " (float,\ out)
-from the VFD
+\fIname\fR.\fBdc-bus-volt\fR (float, out)
+DC bus voltage [V]
+.PP
+.TP
+\fIname\fR.\fBtorque-load\fR (float, out)
+torque load ratio [%]
+.PP
+.TP
+\fIname\fR.\fBres-braking\fR (float, out)
+resistance braking rate [%]
+.PP
+.TP
+\fIname\fR.\fBtorque-overload\fR (float, out)
+torque overload ratio [%]
+.PP
+.TP
+\fIname\fR.\fBerror-code\fR (s32, out)
+servo driver error code
+.PP
+Digital IO is configurable from the Lichuan A4 servo driver \fBnot\fR from this
+HAL module, we assume default settings.
+.TP
+\fIname\fR.\fBdigital-in0\fR (bit, out)
+servo enabling
+.PP
+.TP
+\fIname\fR.\fBdigital-in1\fR (bit, out)
+clear alarm
+.PP
+.TP
+\fIname\fR.\fBdigital-in2\fR (bit, out)
+clockwise stroke limit
+.PP
+.TP
+\fIname\fR.\fBdigital-in3\fR (bit, out)
+anticlockwise stroke limit
+.PP
+.TP
+\fIname\fR.\fBdigital-in4\fR (bit, out)
+clear deviation counter to 0
+.PP
+.TP
+\fIname\fR.\fBdigital-in5\fR (bit, out)
+command pulse prohibition
+.PP
+.TP
+\fIname\fR.\fBdigital-in6\fR (bit, out)
+torque limit switchover
+.PP
+.TP
+\fIname\fR.\fBdigital-in7\fR (bit, out)
+start position of "back to zero"
+.PP
+.TP
+\fIname\fR.\fBdigital-out0\fR (bit, out)
+servo ready
+.PP
+.TP
+\fIname\fR.\fBdigital-out1\fR (bit, out)
+servo alarm
+.PP
+.TP
+\fIname\fR.\fBdigital-out2\fR (bit, out)
+location arrival
+.PP
+.TP
+\fIname\fR.\fBdigital-out3\fR (bit, out)
+brake release
+.PP
+.TP
+\fIname\fR.\fBdigital-out4\fR (bit, out)
+zero speed detection
+.PP
+.TP
+\fIname\fR.\fBdigital-out5\fR (bit, out)
+torque limiting
 .SH PARAMETERS
 Where \fIname\fR is set with option \fB-n\fR, \fB--name\fR or default value.
 .TP
-\fIname\fR.\fBmodbus-read-freq\fR (float,\ rw)
-(default 1.0) How often the Modbus target is read and written to.
+\fIname\fR.\fBmodbus-polling\fR (float,\ rw)
+(default 1.0) Modbus polling frequency [s]
 .PP
 .TP
-\fIname\fR.\fBmodbus-errors\fR (s32,\ ro)
-Modbus error count.
+\fIname\fR.\fBmodbus-errors\fR (u32,\ ro)
+Modbus error count
