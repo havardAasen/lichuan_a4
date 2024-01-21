@@ -38,6 +38,10 @@ Modbus::Modbus(const std::string &device, const int baud_rate, const int data_bi
 
 Modbus& Modbus::operator=(Modbus&& other) noexcept
 {
+    if (mb_ctx) {
+        modbus_close(mb_ctx);
+        modbus_free(mb_ctx);
+    }
     mb_ctx = std::exchange(other.mb_ctx, nullptr);
     return *this;
 }
