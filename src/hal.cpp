@@ -25,7 +25,7 @@ HAL::HAL(std::string_view _hal_name) : hal_name{_hal_name}
         throw std::runtime_error(oss.str());
     }
 
-    if (create_hal_pins()) {
+    if (!create_hal_pins()) {
         hal_exit(hal_comp_id);
         std::ostringstream oss;
         oss << hal_name << ": ERROR: create_hal_pins() failed\n";
