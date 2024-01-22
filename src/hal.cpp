@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <utility>
 
 
 HAL::HAL(std::string_view _hal_name) : hal_name{_hal_name}
@@ -35,6 +36,25 @@ HAL::HAL(std::string_view _hal_name) : hal_name{_hal_name}
 
     initialize_data();
     hal_ready(hal_comp_id);
+}
+
+HAL::HAL(HAL&& rhs) noexcept
+{
+    hal_comp_id = rhs.hal_comp_id;
+    rhs.hal_comp_id = 0;
+    hal_name = std::move(rhs.hal_name);
+    data = std::exchange(rhs.data, nullptr);
+}
+
+HAL& HAL::operator=(HAL&& rhs) noexcept
+{
+    if (hal_comp_id > 0)
+        hal_exit(hal_comp_id);
+    hal_comp_id = rhs.hal_comp_id;
+    rhs.hal_comp_id = 0;
+    hal_name = std::move(rhs.hal_name);
+    data = std::exchange(rhs.data, nullptr);
+    return *this;
 }
 
 HAL::~HAL()
