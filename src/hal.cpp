@@ -27,6 +27,7 @@ HAL::HAL(std::string_view _hal_name) : hal_name{_hal_name}
 
     if (!create_hal_pins()) {
         hal_exit(hal_comp_id);
+        hal_comp_id = 0;
         std::ostringstream oss;
         oss << hal_name << ": ERROR: create_hal_pins() failed\n";
         throw std::runtime_error(oss.str());
@@ -38,6 +39,8 @@ HAL::HAL(std::string_view _hal_name) : hal_name{_hal_name}
 
 HAL::~HAL()
 {
+    if (hal_comp_id < 0)
+        return;
     int ret = hal_exit(hal_comp_id);
     if (ret < 0) {
         std::cerr << hal_name << ": ERROR: hal_exit() failed with code " << ret << "\n";
