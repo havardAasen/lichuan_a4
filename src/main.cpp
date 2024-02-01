@@ -31,7 +31,7 @@ static struct option long_options[] = {
         {nullptr,   0,                  nullptr, 0}
 };
 
-static void quit([[maybe_unused]] int sig)
+static void quit(int)
 {
     done = 1;
 }
