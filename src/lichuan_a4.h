@@ -50,6 +50,7 @@ public:
     void read_data();
     [[nodiscard]] Error_code get_current_error() const noexcept;
     [[nodiscard]] static constexpr std::string_view get_error_message(Error_code code) noexcept;
+    [[nodiscard]] double modbus_polling() const;
 
 private:
     std::string hal_name;

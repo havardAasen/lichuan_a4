@@ -157,3 +157,8 @@ void Lichuan_a4::print_error_message()
         return;
     std::cerr << hal_name << ": ERROR: " << *hal.data->error_code << "\n\t" << message << "\n";
 }
+
+double Lichuan_a4::modbus_polling() const
+{
+    return hal.data->modbus_polling;
+}

@@ -178,7 +178,10 @@ torque limiting
 Where \fIname\fR is set with option \fB-n\fR, \fB--name\fR or default value.
 .TP
 \fIname\fR.\fBmodbus-polling\fR (float,\ rw)
-(default 1.0) Modbus polling frequency [s]
+If multiple devices are connected, the first device is used to set the polling
+frequency.
+.IP
+Modbus polling frequency [s]. Default is 1.0s.
 .PP
 .TP
 \fIname\fR.\fBmodbus-errors\fR (u32,\ ro)

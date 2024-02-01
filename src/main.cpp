@@ -5,6 +5,7 @@
 
 #include "lichuan_a4.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -168,13 +169,11 @@ int main(int argc, char *argv[])
         }
     }
 
+    double modbus_polling = devices.front().modbus_polling();
     while (done == 0) {
-        /* Don't scan to fast, and not delay more than a few seconds */
-        //if (haldata->period < 0.001) haldata->period = 0.001;
-        //if (haldata->period > 2.0) haldata->period = 2.0;
-        //std::chrono::duration<double> period_duration(haldata->period);
-        //std::chrono::nanoseconds period_ns = std::chrono::duration_cast<std::chrono::nanoseconds>(period_duration);
-        std::this_thread::sleep_for(std::chrono::seconds{1});
+        // Don't scan to fast, and not delay more than a few seconds.
+        auto seconds = std::chrono::duration<double>(std::clamp(modbus_polling, 0.001, 2.0));
+        std::this_thread::sleep_for(seconds);
 
         for (auto& servo : devices) {
             servo.read_data();
