@@ -179,12 +179,6 @@ int main(int argc, char *argv[])
         for (auto& servo : devices) {
             servo.read_data();
         }
-
-        /* Debug strings */
-        //printf("Feedback speed: %f\n", *haldata->feedback_speed);
-        //printf("Deviation speed: %f\n", *haldata->deviation_speed);
-        //printf("Modbus-errors: %d\n", haldata->modbus_errors);
-        //printf("\n");
     }
 
     return 0;
