@@ -20,7 +20,7 @@ Modbus::Modbus(const std::string &device, const int baud_rate, const int data_bi
     if (!mb_ctx) {
         std::ostringstream oss;
         oss << "ERROR: Can't open modbus serial device: "
-            << modbus_strerror(errno);
+            << modbus_strerror(errno) << "\n";
         throw std::runtime_error(oss.str());
     }
 

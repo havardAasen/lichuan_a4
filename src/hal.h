@@ -73,8 +73,8 @@ private:
      * @brief Create HAL pins.
      * @return @c true if all pins are created, @c false otherwise.
      */
-    constexpr void initialize_data() noexcept;
     [[nodiscard]] bool create_hal_pins() const noexcept;
+    constexpr void initialize_data() const noexcept;
 
 };
 

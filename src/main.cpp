@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
         switch (opt) {
             case 'd': /* Device name */
                 if (strlen(optarg) > FILENAME_MAX) {
-                    std::cerr << "ERROR: Device name to long: " << optarg << "\n";
+                    std::cerr << "ERROR: Device name to long\n";
                     exit(-1);
                 }
                 device = optarg;
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
     }
 
     if (hal_names.empty() || targets.empty()) {
-        std::cerr << "ERROR: One or both of 'name' and 'target' is empty\n";
+        std::cerr << "ERROR: 'name' or 'target' is empty\n";
         exit(-1);
     }
 

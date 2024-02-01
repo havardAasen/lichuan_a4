@@ -62,9 +62,8 @@ HAL::~HAL()
     if (hal_comp_id < 0)
         return;
     int ret = hal_exit(hal_comp_id);
-    if (ret < 0) {
+    if (ret < 0)
         std::cerr << hal_name << ": ERROR: hal_exit() failed with code " << ret << "\n";
-    }
 }
 
 bool HAL::create_hal_pins() const noexcept
@@ -106,7 +105,7 @@ bool HAL::create_hal_pins() const noexcept
     return true;
 }
 
-constexpr void HAL::initialize_data() noexcept
+constexpr void HAL::initialize_data() const noexcept
 {
     *data->commanded_speed = 0;
     *data->feedback_speed = 0;
